@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ψηφιακό Μητρώο Πολιτών</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+
+<div class="container py-4">
+
+ <h1 class="text-center mb-5" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 600; font-size: 2.8rem; color: #212529; letter-spacing: 0.05em;">
+ Ψηφιακό Μητρώο Πολιτών
+</h1>
+
+
+  <!-- Δημιουργία Πολίτη -->
+  <div class="card mb-4 border-primary shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">Δημιουργία Πολίτη</h5>
+    </div>
+    <div class="card-body">
+      <form id="createForm" onsubmit="event.preventDefault(); createCitizen();">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label for="createAt" class="form-label">ΑΤ (8 χαρακτήρες) *</label>
+            <input type="text" class="form-control" id="createAt" required maxlength="8" />
+          </div>
+          <div class="col-md-4">
+            <label for="createFirstName" class="form-label">Όνομα *</label>
+            <input type="text" class="form-control" id="createFirstName" required />
+          </div>
+          <div class="col-md-4">
+            <label for="createLastName" class="form-label">Επίθετο *</label>
+            <input type="text" class="form-control" id="createLastName" required />
+          </div>
+          <div class="col-md-4">
+            <label for="createGender" class="form-label">Φύλο *</label>
+            <input type="text" class="form-control" id="createGender" required />
+          </div>
+          <div class="col-md-4">
+            <label for="createDateOfBirth" class="form-label">Ημερομηνία Γέννησης (dd-MM-yyyy) *</label>
+            <input type="text" class="form-control" id="createDateOfBirth" required placeholder="πχ. 12-11-2008" />
+          </div>
+          <div class="col-md-4">
+            <label for="createAfm" class="form-label">ΑΦΜ (προαιρετικό)</label>
+            <input type="text" class="form-control" id="createAfm" maxlength="9" />
+          </div>
+          <div class="col-md-12">
+            <label for="createAddress" class="form-label">Διεύθυνση (προαιρετικό)</label>
+            <input type="text" class="form-control" id="createAddress" />
+          </div>
+        </div>
+        <div class="mt-3 text-end">
+          <button type="submit" class="btn btn-primary">Δημιουργία</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Ενημέρωση Πολίτη -->
+  <div class="card mb-4 border-warning shadow-sm">
+    <div class="card-header bg-warning text-dark">
+      <h5 class="mb-0">Ενημέρωση Πολίτη (μόνο ΑΦΜ & Διεύθυνση)</h5>
+    </div>
+    <div class="card-body">
+      <form id="updateForm" onsubmit="event.preventDefault(); updateCitizen();">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label for="updateAt" class="form-label">ΑΤ (8 χαρακτήρες) *</label>
+            <input type="text" class="form-control" id="updateAt" required maxlength="8" />
+          </div>
+          <div class="col-md-4">
+            <label for="updateAfm" class="form-label">Νέο ΑΦΜ (άδειο για να μη αλλάξει)</label>
+            <input type="text" class="form-control" id="updateAfm" maxlength="9" />
+          </div>
+          <div class="col-md-4">
+            <label for="updateAddress" class="form-label">Νέα Διεύθυνση (άδειο για να μη αλλάξει)</label>
+            <input type="text" class="form-control" id="updateAddress" />
+          </div>
+        </div>
+        <div class="mt-3 text-end">
+          <button type="submit" class="btn btn-warning">Ενημέρωση</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Διαγραφή Πολίτη -->
+  <div class="card mb-4 border-danger shadow-sm">
+    <div class="card-header bg-danger text-white">
+      <h5 class="mb-0">Διαγραφή Πολίτη</h5>
+    </div>
+    <div class="card-body">
+      <form id="deleteForm" onsubmit="event.preventDefault(); deleteCitizen();">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label for="deleteAt" class="form-label">ΑΤ (8 χαρακτήρες) *</label>
+            <input type="text" class="form-control" id="deleteAt" required maxlength="8" />
+          </div>
+        </div>
+        <div class="mt-3 text-end">
+          <button type="submit" class="btn btn-danger">Διαγραφή</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Αναζήτηση με Φίλτρα -->
+  <div class="card mb-4 border-info shadow-sm">
+    <div class="card-header bg-info text-white">
+      <h5 class="mb-0">Αναζήτηση Πολιτών με Φίλτρα</h5>
+    </div>
+    <div class="card-body">
+      <form id="searchForm" onsubmit="event.preventDefault(); searchCitizensWithFilters();">
+        <div class="row g-3">
+          <div class="col-md-2">
+            <input type="text" class="form-control" id="searchAt" placeholder="ΑΤ (8 χαρακτήρες)" maxlength="8" />
+          </div>
+          <div class="col-md-2">
+            <input type="text" class="form-control" id="searchFirstName" placeholder="Όνομα" />
+          </div>
+          <div class="col-md-2">
+            <input type="text" class="form-control" id="searchLastName" placeholder="Επίθετο" />
+          </div>
+          <div class="col-md-2">
+            <input type="text" class="form-control" id="searchGender" placeholder="Φύλο" />
+          </div>
+          <div class="col-md-2">
+            <input type="text" class="form-control" id="searchDateOfBirth" placeholder="Ημ. Γέννησης (dd-MM-yyyy)" />
+          </div>
+          <div class="col-md-2">
+            <input type="text" class="form-control" id="searchAfm" placeholder="ΑΦΜ (9 ψηφία)" maxlength="9" />
+          </div>
+          <div class="col-md-4 mt-3">
+            <input type="text" class="form-control" id="searchAddress" placeholder="Διεύθυνση" />
+          </div>
+        </div>
+        <div class="mt-3 text-end">
+          <button type="submit" class="btn btn-info">Αναζήτηση</button>
+          <button class="btn btn-success" onclick="event.preventDefault(); searchCitizens();">Φέρε Όλους τους Πολίτες</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Αποτελέσματα Αναζήτησης -->
+  <div class="card mb-4 border-success shadow-sm" id="searchResultsCard" style="display:none;">
+    <div class="card-header bg-success text-white">
+      <h5 class="mb-0">Αναζήτηση Πολιτών</h5>
+    </div>
+    <div class="card-body">
+      <div id="search-results" class="table-responsive"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Bootstrap Modal -->
+<div class="modal fade" id="responseModal" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="responseModalLabel">Μήνυμα</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Κλείσιμο"></button>
+      </div>
+      <div class="modal-body" id="modalMessage"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Κλείσιμο</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS Bundle (με Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+const apiBaseUrl = 'http://localhost:8080/api';
+const responseModal = new bootstrap.Modal(document.getElementById('responseModal'));
+const modalMessage = document.getElementById('modalMessage');
+
+function showModal(message) {
+  modalMessage.textContent = message;
+  responseModal.show();
+}
+
+// Δημιουργία πολίτη
+async function createCitizen() {
+  const citizen = {
+    at: document.getElementById('createAt').value.trim(),
+    firstName: document.getElementById('createFirstName').value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim(),
+    lastName: document.getElementById('createLastName').value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim(),
+    gender: document.getElementById('createGender').value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim(),
+    dateOfBirth: document.getElementById('createDateOfBirth').value.trim(),
+    afm: document.getElementById('createAfm').value.trim(),
+    address: document.getElementById('createAddress').value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim()
+  };
+
+  try {
+    const response = await fetch(apiBaseUrl + '/citizens', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(citizen)
+    });
+    const text = await response.text();
+    if (response.ok) {
+      showModal('Πολίτης δημιουργήθηκε με επιτυχία!');
+      document.getElementById('createForm').reset();
+    } else {
+      showModal(`Σφάλμα: ${text}`);
+    }
+  } catch (error) {
+    showModal(`Σφάλμα δικτύου: ${error.message}`);
+  }
+}
+
+async function updateCitizen() {
+  const at = document.getElementById('updateAt').value.trim();
+  if (!at) {
+    showModal('Παρακαλώ δώστε ΑΤ για ενημέρωση');
+    return;
+  }
+
+  const updateData = {};
+  const afm = document.getElementById('updateAfm').value.trim();
+  const address = document.getElementById('updateAddress').value.trim();
+
+  if (afm !== '') updateData.afm = afm;
+  if (address !== '') updateData.address = address;
+
+  if (Object.keys(updateData).length === 0) {
+    showModal('Παρακαλώ συμπληρώστε τουλάχιστον ένα από τα πεδία ΑΦΜ ή Διεύθυνση για ενημέρωση');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${apiBaseUrl}/citizens/${at}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updateData)
+    });
+    const text = await response.text();
+    if (response.ok) {
+      showModal('Επιτυχής ενημέρωση!');
+      document.getElementById('updateForm').reset();
+    } else {
+      showModal(`Σφάλμα: ${text}`);
+    }
+  } catch (error) {
+    showModal(`Σφάλμα δικτύου: ${error.message}`);
+  }
+}
+
+async function deleteCitizen() {
+  const at = document.getElementById('deleteAt').value.trim();
+  if (!at) {
+    showModal('Παρακαλώ δώστε ΑΤ για διαγραφή');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${apiBaseUrl}/citizens/${at}`, {
+      method: 'DELETE'
+    });
+    const text = await response.text();
+    if (response.ok) {
+      showModal('Πολίτης διαγράφηκε με επιτυχία!');
+      document.getElementById('deleteForm').reset();
+    } else {
+      showModal(`Σφάλμα: ${text}`);
+    }
+  } catch (error) {
+    showModal(`Σφάλμα δικτύου: ${error.message}`);
+  }
+}
+
+// Αναζήτηση όλων των πολιτών
+function searchCitizens() {
+  fetch(`${apiBaseUrl}/citizens`)
+    .then(response => {
+      if (!response.ok) {
+        return response.text().then(text => { throw new Error(text); });
+      }
+      return response.json();
+    })
+    .then(citizens => {
+      displaySearchResults(citizens);
+    })
+    .catch(error => {
+      document.getElementById('search-results').innerHTML = '';
+      document.getElementById('searchResultsCard').style.display = 'none';
+      showModal(`Σφάλμα αναζήτησης: ${error.message}`);
+    });
+}
+
+function searchCitizensWithFilters() {
+  const params = new URLSearchParams();
+
+  const at = document.getElementById('searchAt').value.trim();
+  const firstName = document.getElementById('searchFirstName').value.trim();
+  const lastName = document.getElementById('searchLastName').value.trim();
+  const gender = document.getElementById('searchGender').value.trim();
+  const dateOfBirth = document.getElementById('searchDateOfBirth').value.trim();
+  const afm = document.getElementById('searchAfm').value.trim();
+  const address = document.getElementById('searchAddress').value.trim();
+  
+  if (!at && !firstName && !lastName && !gender && !dateOfBirth && !afm && !address) {
+	    showModal('Δεν έχουν εισαχθεί δεδομένα προς αναζήτηση.');
+	    return;
+	  }
+
+  if (at) params.append('at', at);
+  if (firstName) params.append('firstName', firstName);
+  if (lastName) params.append('lastName', lastName);
+  if (gender) params.append('gender', gender);
+  if (dateOfBirth) params.append('dateOfBirth', dateOfBirth);
+  if (afm) params.append('afm', afm);
+  if (address) params.append('address', address);
+
+  fetch(`${apiBaseUrl}/citizens?${params.toString()}`)
+    .then(response => {
+      if (!response.ok) {
+        return response.text().then(text => { throw new Error(text); });
+      }
+      return response.json();
+    })
+    .then(citizens => {
+      displaySearchResults(citizens);
+    })
+    .catch(error => {
+      document.getElementById('search-results').innerHTML = '';
+      document.getElementById('searchResultsCard').style.display = 'none';
+      showModal(`Σφάλμα αναζήτησης: ${error.message}`);
+    });
+}
+
+function displaySearchResults(citizens) {
+  const container = document.getElementById('search-results');
+  const card = document.getElementById('searchResultsCard');
+  container.innerHTML = '';
+
+  if (!citizens || citizens.length === 0) {
+    card.style.display = 'none';
+    container.innerHTML = '<div class="alert alert-warning">Δεν βρέθηκαν εγγραφές.</div>';
+    return;
+  }
+
+  const table = document.createElement('table');
+  table.classList.add('table', 'table-striped', 'table-bordered', 'table-hover');
+
+  const thead = document.createElement('thead');
+  thead.innerHTML = `<tr class="table-primary">
+    <th>ΑΤ</th><th>Όνομα</th><th>Επίθετο</th><th>Φύλο</th><th>Ημερομηνία Γέννησης</th><th>ΑΦΜ</th><th>Διεύθυνση</th>
+  </tr>`;
+
+  const tbody = document.createElement('tbody');
+  citizens.forEach(c => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${c.at}</td>
+      <td>${c.firstName}</td>
+      <td>${c.lastName}</td>
+      <td>${c.gender}</td>
+      <td>${c.dateOfBirth}</td>
+      <td>${c.afm || ''}</td>
+      <td>${c.address || ''}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  table.appendChild(thead);
+  table.appendChild(tbody);
+  container.appendChild(table);
+  card.style.display = 'block';
+}
+</script>
+
+</body>
+</html>
