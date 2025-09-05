@@ -2,10 +2,36 @@ provider "aws" {
   region = var.region
 }
 
+#Security group allowing SSH - Due to failure in my network
+resource "aws_security_group" "allow_ssh" {
+  name        = "allow_ssh"
+  description = "Allow SSH"
+
+  ingress {
+    description = "SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "allow_ssh"
+  }
+}
+
 resource "aws_instance" "db" {
   ami           = "ami-0aff18ec83b712f05" # Ubuntu Server 24.04 LTS AMI
   instance_type = var.instance_type_db
   key_name      = var.key_name
+  vpc_security_group_ids = [aws_security_group.allow_ssh.id]  # attach SG here
   tags = {
     Name = "mysql-db"
   }
@@ -44,7 +70,7 @@ resource "null_resource" "wait_for_db_instance" {
     connection {
       type        = "ssh"
       user        = "ubuntu"
-      private_key = file("C:/users/kiria/Desktop/cloud_test.pem")
+      private_key = file("~/.ssh/cloud_test.pem")
       host        = aws_instance.db.public_ip
     }
   }
@@ -56,18 +82,20 @@ resource "aws_ami_from_instance" "db_ami" {
   source_instance_id = aws_instance.db.id
  
   tags = {
-    Name = "books-db-ami"
+    Name = "citizen-db-ami"
   }
 
   depends_on = [null_resource.wait_for_db_instance]
 }
 
 resource "aws_instance" "app" {
+  count         = 3
   ami           = "ami-0aff18ec83b712f05"  # Ubuntu Server 24.04 LTS AMI
   instance_type = var.instance_type_app
   key_name      = var.key_name
+  vpc_security_group_ids = [aws_security_group.allow_ssh.id]  # attach SG here
   tags = {
-    Name = "spring-boot-setup"
+    Name = "spring-boot-setup-${count.index + 1}"
   }
 
   user_data = <<-EOF
@@ -85,6 +113,10 @@ resource "aws_instance" "app" {
 
 # Poll for instance status to ensure user data script completes
 resource "null_resource" "wait_for_app_instance" {
+
+  for_each = { for idx, inst in aws_instance.app : idx => inst }
+
+
   depends_on = [aws_instance.app]
 
   provisioner "remote-exec" {
@@ -96,18 +128,21 @@ resource "null_resource" "wait_for_app_instance" {
     connection {
       type        = "ssh"
       user        = "ubuntu"
-      private_key = file("C:/users/kiria/Desktop/cloud_test.pem")
-      host        = aws_instance.app.public_ip
+      private_key = file("~/.ssh/cloud_test.pem")
+      host        = each.value.public_ip
     }
   }
 }
 
 resource "aws_ami_from_instance" "app_ami" {
-  name               = "app-ami"
-  source_instance_id = aws_instance.app.id
+
+  for_each = { for idx, inst in aws_instance.app : idx => inst }
+
+  name               = "app-ami-${each.key}"
+  source_instance_id = each.value.id
   
   tags = {
-    Name = "book-app-ami"
+    Name = "citizen-app-ami-${each.key}"
   }
   
   depends_on = [null_resource.wait_for_app_instance]
