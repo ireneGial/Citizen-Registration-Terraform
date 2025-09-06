@@ -87,7 +87,7 @@ resource "aws_instance" "db" {
   vpc_security_group_ids  = [aws_security_group.db_sg.id]
 
   tags = {
-    Name = "Book DB"
+    Name = "citizen"
   }
 }
 
